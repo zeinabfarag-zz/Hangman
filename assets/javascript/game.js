@@ -1,191 +1,128 @@
-$(document).ready(function() {
-  var wordList = [
-    "eminem",
-    "big sean",
-    "drake",
-    "kendrick",
-    "kanye",
-    "logic",
-    "migos",
-    "post malone",
-    "jay z",
-    "future"
-  ];
+var game = {
+  word: '',
+  guesses_left: 12,
+  letters_guessed: [],
+  wins: 0,
+  assignWord: function() {
+    var words = [
+      'stranger things',
+      'house of cards',
+      'friends',
+      'the crown',
+      'jessica jones',
+      'suits'
+    ];
+    this.word = words[Math.floor(Math.random() * words.length)];
+  },
 
-  // pick random word from list
-  var draftWord = wordList[Math.floor(Math.random() * wordList.length)];
+  resetGame: function() {
+    this.guesses_left = 12;
+    this.letters_guessed = [];
+    this.assignWord();
+  },
 
-  // divide word into an array of its characters
-  var currentWord = draftWord.split("");
-
-  // initial global variable settings
-  var winCounter = 0;
-  var guessCounter = draftWord.length + 5;
-  $("#guessnumber").html(guessCounter);
-  var allGuess = [];
-  var guessList = [];
-
-  // hiding word from player
-  for (var i = 0; i < currentWord.length; i++) {
-    currentWord[i] = " _ ";
-  }
-  $("#word").html(currentWord);
-
-  // ensure no word is repeated
-  function remove(array, element) {
-    const index = array.indexOf(element);
-
-    if (index !== -1) {
-      array.splice(index, 1);
-    }
-  }
-
-  // display all instances of a letter within a word
-  function getAllIndexes(arr, val) {
-    var indexes = [],
-      i;
-    for (i = 0; i < arr.length; i++) if (arr[i] === val) indexes.push(i);
-    return indexes;
-  }
-
-  // player can guess letter only once
-  function removeDuplicates(arr) {
-    var unique_array = [];
-    for (var i = 0; i < arr.length; i++) {
-      if (unique_array.indexOf(arr[i]) == -1) {
-        unique_array.push(arr[i]);
+  gussedAlready: function(letter) {
+    for (var i = 0; i < this.letters_guessed.length; i++) {
+      /* console.log(game.letters_guessed);
+      console.log(
+        'Length of letters_guessed array: ' + game.letters_guessed.length
+      );
+      console.log('Current value of i: ' + i); */
+      console.log(
+        'Input Letter: ' +
+          letter +
+          ' Current Letter: ' +
+          this.letters_guessed[i].toLocaleLowerCase()
+      );
+      if (letter === this.letters_guessed[i].toLowerCase()) {
+        return true;
       }
     }
-    return unique_array;
-  }
+    this.letters_guessed.push(letter);
+    this.guesses_left -= 1;
+    console.log('Guesses left: ' + this.guesses_left);
+    console.log('Current list of letters guessed: ' + this.letters_guessed);
+    return false;
+  },
 
-  // activated when player wins
-  function imageSound() {
-    if (draftWord === "logic") {
-      $("#winimg").attr("src", "assets/images/logic.jpeg");
-
-      $("#winaudio").attr("src", "assets/audio/logic.mp3");
-    }
-    if (draftWord === "migos") {
-      $("#winimg").attr("src", "assets/images/migos.jpeg");
-
-      $("#winaudio").attr("src", "assets/audio/migos.mp3");
-    }
-    if (draftWord === "post malone") {
-      $("#winimg").attr("src", "assets/images/postmalone.jpeg");
-
-      $("#winaudio").attr("src", "assets/audio/postmalone.mp3");
-    }
-    if (draftWord === "jay z") {
-      $("#winimg").attr("src", "assets/images/jayz.jpeg");
-
-      $("#winaudio").attr("src", "assets/audio/jayz.mp3");
-    }
-    if (draftWord === "future") {
-      $("#winimg").attr("src", "assets/images/future.jpeg");
-
-      $("#winaudio").attr("src", "assets/audio/future.mp3");
-    }
-
-    if (draftWord === "kanye") {
-      $("#winimg").attr("src", "assets/images/kanye.jpeg");
-
-      $("#winaudio").attr("src", "assets/audio/kanye.mp3");
-    }
-
-    if (draftWord === "kendrick") {
-      $("#winimg").attr("src", "assets/images/kendrick.jpeg");
-
-      $("#winaudio").attr("src", "assets/audio/kendrick.mp3");
-    }
-    if (draftWord === "big sean") {
-      $("#winimg").attr("src", "assets/images/bigsean.jpeg");
-
-      $("#winaudio").attr("src", "assets/audio/bigsean.mp3");
-    }
-
-    if (draftWord === "drake") {
-      $("#winimg").attr("src", "assets/images/drake.jpeg");
-
-      $("#winaudio").attr("src", "assets/audio/drake.mp3");
-    }
-    if (draftWord === "eminem") {
-      $("#winimg").attr("src", "assets/images/eminem.jpeg");
-
-      $("#winaudio").attr("src", "assets/audio/eminem.mp3");
-    }
-    restartGame();
-  }
-
-  // alerts player that they lost that round
-  function lossGame() {
-    alert("You ran out of guesses! Hint(first letter): " + draftWord[0]);
-    restartGame();
-  }
-
-  // activated after player wins/loses a round to reset
-  function restartGame() {
-    allGuess = [];
-    guessList = [];
-    $("#userguess").html(guessList + " ");
-
-    // alerts player when they have won all rounds of the game
-    if (wordList.length == 0) {
-      alert("Congratulations you have guessed all the options correctly!");
-    }
-
-    draftWord = wordList[Math.floor(Math.random() * wordList.length)];
-
-    currentWord = draftWord.split("");
-    for (var i = 0; i < currentWord.length; i++) {
-      currentWord[i] = " _ ";
-    }
-    guessCounter = draftWord.length + 5;
-    $("#guessnumber").html(guessCounter);
-
-    $("#word").html(currentWord);
-  }
-
-  document.onkeyup = function(event) {
-    userGuess = event.key.toLowerCase();
-
-    // function and for loop to display all instances of one letter
-    var indexArray = getAllIndexes(draftWord, userGuess);
-
-    for (var i = 0; i < draftWord.length; i++) {
-      if (indexArray.length > 1) {
-        currentWord[indexArray[i]] = userGuess;
+  guessLetter: function(letter) {
+    /* letters_guessed.push(letter); */
+    document.getElementById('start').textContent = 'Letter Guessed: ' + letter;
+    for (var i = 0; i < this.word.length; i++) {
+      if (letter === this.word[i].toLowerCase()) {
+        return true;
       }
     }
-    if (draftWord.indexOf(userGuess) > -1) {
-      currentWord[draftWord.indexOf(userGuess)] = userGuess;
-    } //ensures that a letter can only be guessed once
-    else if (
-      draftWord.indexOf(userGuess) == -1 &&
-      guessList.indexOf(userGuess) == -1
-    ) {
-      allGuess.push(userGuess);
+    return false;
+  },
 
-      guessList = removeDuplicates(allGuess);
-      $("#userguess").html(guessList + " ");
-
-      guessCounter--;
-      $("#guessnumber").html(guessCounter);
+  currentWordState: function() {
+    var currentWord = '';
+    for (var i = 0; i < this.word.length; i++) {
+      if (this.word[i] === ' ') {
+        currentWord += ' ';
+      } else if (this.letters_guessed.includes(this.word[i])) {
+        currentWord += this.word[i];
+      } else {
+        currentWord += '_';
+      }
     }
+    document.getElementById('current-word').textContent =
+      'Current Word: ' + currentWord;
+    document.getElementById('remaning-guesses').textContent =
+      'Number of guesses remaining: ' + this.guesses_left;
+    document.getElementById('already-guessed').textContent =
+      'Letters already guessed: ' + this.letters_guessed;
+    return currentWord;
+  },
 
-    $("#word").html(currentWord);
+  won: function() {
+    this.resetGame();
+    this.wins += 1;
+    console.log('You win!');
+    console.log('Current wins: ' + this.wins);
+    document.getElementById('wins').textContent = 'Wins: ' + this.wins;
+    document.getElementById('start').textContent =
+      'You win! Press any key to start again.';
+  },
 
-    // player wins
-    if (currentWord.indexOf(" _ ") === -1) {
-      winCounter++;
-      $("#wins").html(winCounter);
-      remove(wordList, draftWord);
+  lost: function() {
+    this.resetGame();
+    console.log('You lose!');
+    console.log('Current wins: ' + this.wins);
+    document.getElementById('start').textContent =
+      'You lose. Press any key to start again.';
+  }
+};
 
-      imageSound();
+function isLetter(str) {
+  return str.length === 1 && str.match(/[a-z]/i);
+}
+
+game.assignWord();
+
+document.onkeyup = function(event) {
+  document.getElementById('start').textContent = '';
+  console.log(game.word);
+  var userInput = event.key.toLowerCase();
+
+  if (isLetter(userInput)) {
+    console.log('User Input: ' + userInput);
+
+    if (game.gussedAlready(userInput)) {
+      document.getElementById('start').textContent =
+        'You already guessed that letter. Try another.';
+    } else {
+      console.log(game.guessLetter(userInput));
+      console.log(game.currentWordState());
+
+      if (game.currentWordState() === game.word) {
+        game.won();
+      } else if (game.guesses_left === 0) {
+        game.lost();
+      }
     }
-    // player loses
-    if (guessCounter == 0) {
-      lossGame();
-    }
-  };
-});
+  } else {
+    document.getElementById('start').textContent = 'Press a valid key. [a-z]';
+  }
+};
