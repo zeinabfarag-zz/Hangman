@@ -11,3 +11,4 @@ A word guessing game using javascript.
 ## Website
 
 https://zeinabfarag.github.io/Hangman/
+
